@@ -1,0 +1,81 @@
+Resources:
+  DynamodbScoresTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: ${self:custom.variables.dynamodb.tableName}
+      AttributeDefinitions:
+        - AttributeName: hotel_id
+          AttributeType: N
+        - AttributeName: aspect
+          AttributeType: S
+      KeySchema:
+        - AttributeName: hotel_id
+          KeyType: HASH
+        - AttributeName: aspect
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: ${self:custom.variables.dynamodb.cache.read}
+        WriteCapacityUnits: ${self:custom.variables.dynamodb.cache.write}
+
+  CacheTableWriteCapacityScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: ${self:custom.variables.dynamodb.cache.scaling.write.maxCapacity}
+      MinCapacity: ${self:custom.variables.dynamodb.cache.scaling.write.minCapacity}
+      ResourceId:
+        Fn::Join:
+          - /
+          - - table
+            - { Ref: DynamodbScoresTable }
+      RoleARN:
+        Fn::GetAtt:
+          - ScoresScalingRole
+          - Arn
+      ScalableDimension: dynamodb:table:WriteCapacityUnits
+      ServiceNamespace: dynamodb
+
+  CacheTableWriteScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: WriteAutoScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId:
+        Ref: CacheTableWriteCapacityScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: ${self:custom.variables.dynamodb.cache.scaling.write.targetValue}
+        ScaleInCooldown: ${self:custom.variables.dynamodb.cache.scaling.write.scaleInCooldown}
+        ScaleOutCooldown: ${self:custom.variables.dynamodb.cache.scaling.write.scaleOutCooldown}
+        PredefinedMetricSpecification:
+          PredefinedMetricType: DynamoDBWriteCapacityUtilization
+
+  CacheTableReadCapacityScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: ${self:custom.variables.dynamodb.cache.scaling.read.maxCapacity}
+      MinCapacity: ${self:custom.variables.dynamodb.cache.scaling.read.minCapacity}
+      ResourceId:
+        Fn::Join:
+          - /
+          - - table
+            - { Ref: DynamodbScoresTable }
+      RoleARN:
+        Fn::GetAtt:
+          - ScoresScalingRole
+          - Arn
+      ScalableDimension: dynamodb:table:ReadCapacityUnits
+      ServiceNamespace: dynamodb
+
+  CacheTableReadScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: ReadAutoScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId:
+        Ref: CacheTableReadCapacityScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: ${self:custom.variables.dynamodb.cache.scaling.read.targetValue}
+        ScaleInCooldown: ${self:custom.variables.dynamodb.cache.scaling.read.scaleInCooldown}
+        ScaleOutCooldown: ${self:custom.variables.dynamodb.cache.scaling.read.scaleOutCooldown}
+        PredefinedMetricSpecification:
+          PredefinedMetricType: DynamoDBReadCapacityUtilization

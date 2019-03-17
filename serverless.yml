@@ -1,0 +1,110 @@
+service: hotel-aspect-scores
+
+frameworkVersion: ">=1.34.0"
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  staging:
+    accountId: 425691372215
+  prune:
+    automatic: true
+    number: 2
+  variables: ${file(./serverless/serverless.${self:custom.stage}.yml):Variables}
+
+provider:
+  name: aws
+  runtime: python3.6
+  cfLogs: true
+  region: ap-southeast-1
+  environment: ${file(config/env-${self:custom.stage}.yml)}
+  deploymentBucket:
+    name: iflix-datalake-staging-serverless-deployments
+
+layers:
+  PandasBoto3:
+    path: layers/pandas_boto3
+    buildScript: ./get_layer_packages.sh                         
+    name: ${self:service}-Python36-Pandas24x 
+    description: Pandas 0.24.x with Python 3.6 
+    compatibleRuntimes:                         
+      - python3.6
+    licenseInfo: MIT License                    
+    allowedAccounts:                            
+      - '*'
+
+package:
+  individually: true
+
+functions:
+  HotelAspectScores:
+    handler: hotel_aspect_scores.lambda_handler
+    name: hotel-aspect-scores
+    role: hotelAspectScoresRole
+    memorySize: 3008
+    timeout: 900
+    layers:
+      - {Ref: PandasBoto3LambdaLayer}
+    events:
+      - existingS3:
+          bucket: arn:aws:s3:::iflix-test-bucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: raw/
+            - suffix: .csv
+resources:
+    - ${file(./serverless/ddb/scaling-role.yml)}
+    - ${file(./serverless/ddb/scores-table.yml)}
+    - Resources:
+        s3InvokePermission:
+          Type: AWS::Lambda::Permission
+          Properties:
+            Principal: s3.amazonaws.com
+            FunctionName: 
+              "Fn::GetAtt":
+              - HotelAspectScoresLambdaFunction
+              - Arn
+            Action: lambda:InvokeFunction
+        hotelAspectScoresRole:
+          Type: AWS::IAM::Role
+          Properties:
+            RoleName: HotelAspectScoresRole
+            AssumeRolePolicyDocument:
+              Statement:
+                - Effect: Allow
+                  Principal:
+                    Service:
+                      - lambda.amazonaws.com
+                  Action: sts:AssumeRole
+            Policies:
+              - PolicyName: HotelAspectScoreLogPolicy
+                PolicyDocument:
+                  Version: "2012-10-17"
+                  Statement:
+                    - Effect: "Allow"
+                      Action:
+                        - "logs:CreateLogGroup"
+                        - "logs:CreateLogStream"
+                        - "logs:PutLogEvents"
+                      Resource: "*"
+                    - Effect: "Allow"
+                      Action:
+                        - "s3:Get*"
+                        - "s3:List*"
+                      Resource: "*"
+                    - Effect: "Allow"
+                      Action:
+                        - "dynamodb:CreateTable"
+                        - "dynamodb:PutItem"
+                        - "dynamodb:DescribeTable"
+                        - "dynamodb:GetItem"
+                        - "dynamodb:UpdateItem"
+                        - "dynamodb:DeleteItem"
+                        - "dynamodb:Scan"
+                      Resource: 
+                        - "arn:aws:dynamodb:${self:provider.region}:${self:custom.${opt:stage}.accountId}:table/Scores"
+
+plugins:
+  - serverless-prune-plugin
+  - serverless-python-requirements
+  - serverless-plugin-existing-s3
+  - serverless-dependson-plugin

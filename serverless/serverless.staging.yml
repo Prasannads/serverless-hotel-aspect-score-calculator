@@ -1,0 +1,19 @@
+Variables:
+  dynamodb:
+    tableName: "Scores"
+    cache:
+      read: 20
+      write: 20
+      scaling:
+        write:
+          maxCapacity: 50
+          minCapacity: 20
+          targetValue: 50
+          scaleInCooldown: 30
+          scaleOutCooldown: 30
+        read:
+          maxCapacity: 50
+          minCapacity: 20
+          targetValue: 50
+          scaleInCooldown: 30
+          scaleOutCooldown: 30
