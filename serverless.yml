@@ -28,9 +28,8 @@ layers:
     description: Pandas 0.24.x with Python 3.6 
     compatibleRuntimes:                         
       - python3.6
-    licenseInfo: MIT License                    
     allowedAccounts:                            
-      - '*'
+      - 123456789
 
 package:
   individually: true
