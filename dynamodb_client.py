@@ -104,7 +104,9 @@ class CreateUpdateAndDeleteAspectScore(object):
                         response = self.dynamodb.scan(
                             TableName=self.tableName,
                             ProjectionExpression=pe,
-                            ExclusiveStartKey=response['LastEvaluatedKey']
+                            ExclusiveStartKey=response['LastEvaluatedKey'],
+                            ConsistentRead=True,
+                            ReturnConsumedCapacity=True
                         )
                         for item in response['Items']:
                             self.ddbScores.extend(dynamodb_json.loads(item))

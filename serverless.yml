@@ -5,7 +5,7 @@ frameworkVersion: ">=1.34.0"
 custom:
   stage: ${opt:stage, self:provider.stage}
   staging:
-    accountId: 425691372215
+    accountId: 123456789
   prune:
     automatic: true
     number: 2
@@ -18,7 +18,7 @@ provider:
   region: ap-southeast-1
   environment: ${file(config/env-${self:custom.stage}.yml)}
   deploymentBucket:
-    name: iflix-datalake-staging-serverless-deployments
+    name: serverless-deployments
 
 layers:
   PandasBoto3:
@@ -40,13 +40,13 @@ functions:
     handler: hotel_aspect_scores.lambda_handler
     name: hotel-aspect-scores
     role: hotelAspectScoresRole
-    memorySize: 3008
-    timeout: 900
+    memorySize: 256
+    timeout: 60
     layers:
       - {Ref: PandasBoto3LambdaLayer}
     events:
       - existingS3:
-          bucket: arn:aws:s3:::iflix-test-bucket
+          bucket: arn:aws:s3:::bucket
           event: s3:ObjectCreated:*
           rules:
             - prefix: raw/
