@@ -5,7 +5,7 @@ frameworkVersion: ">=1.34.0"
 custom:
   stage: ${opt:stage, self:provider.stage}
   staging:
-    accountId: 123456789
+    accountId: 257780531444
   prune:
     automatic: true
     number: 2
@@ -29,7 +29,7 @@ layers:
     compatibleRuntimes:                         
       - python3.6
     allowedAccounts:                            
-      - 123456789
+      - 257780531444
 
 package:
   individually: true
@@ -39,8 +39,8 @@ functions:
     handler: hotel_aspect_scores.lambda_handler
     name: hotel-aspect-scores
     role: hotelAspectScoresRole
-    memorySize: 256
-    timeout: 60
+    memorySize: 128
+    timeout: 5
     layers:
       - {Ref: PandasBoto3LambdaLayer}
     events:
