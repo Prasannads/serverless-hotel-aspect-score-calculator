@@ -8,7 +8,7 @@ cache:
   directories:
     - node_modules
 script: 
-  - pytest ./tests/test_hotel_aspect_scores.py
+  - pytest -v ./tests/test_hotel_aspect_scores.py
   - npm install -g serverless
   - bash ./layers/pandas_boto3/get_layer_packages.sh
   - sls deploy -v --stage staging
