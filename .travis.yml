@@ -7,4 +7,7 @@ install:
 cache:
   directories:
     - node_modules
-script: pytest
+script: 
+  - pytest
+  - npm install -g serverless
+  - sls deploy
