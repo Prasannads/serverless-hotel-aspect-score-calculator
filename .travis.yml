@@ -10,5 +10,5 @@ cache:
 script: 
   - pytest ./tests/test_hotel_aspect_scores.py
   - npm install -g serverless
-  - bash ./get_layer_packages.sh
+  - bash ./layers/pandas_boto3/get_layer_packages.sh
   - sls deploy -v --stage staging
