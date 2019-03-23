@@ -1,5 +1,10 @@
 language: python
 python: "3.6"
+node_js: "10.15.3"
 install:
   - pip install -r ci_requirements.txt
+  - npm install
+cache:
+  directories:
+    - node_modules
 script: pytest
