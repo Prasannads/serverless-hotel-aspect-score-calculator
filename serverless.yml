@@ -15,10 +15,10 @@ provider:
   name: aws
   runtime: python3.6
   cfLogs: true
-  region: ap-southeast-1
+  region: us-east-1
   environment: ${file(config/env-${self:custom.stage}.yml)}
   deploymentBucket:
-    name: serverless-deployments
+    name: my-serverless-deployments
 
 layers:
   PandasBoto3:
