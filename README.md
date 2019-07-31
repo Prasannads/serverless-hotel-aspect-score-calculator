@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/Prasannads/serverless-hotel-aspect-score-calculator.svg?branch=master)](https://travis-ci.org/Prasannads/serverless-hotel-aspect-score-calculator)
 
-# Overview of this Lambda Function
+# Overview of this Lambda Function.
 
 The purpose of the lambda function is aggregate aspect scores of a hotel whenever there is new/updated/deleted aspect score of a hotel
 
