@@ -1,6 +1,6 @@
 {
   "name": "datalake-parquet-converter",
-  "description": "To deploy to development, run export AWS_PROFILE=iflix-datalake-dev/developer saml2aws login --profile iflix-datalake-dev/developer sls deploy -v --stage staging",
+  "description": "To deploy to development, run sls deploy -v --stage staging",
   "version": "0.1.0",
   "dependencies": {
     "serverless": "^1.37.1",
