@@ -1,6 +1,6 @@
 # Serverless lambda function to calculate aspect scores of a hotel
 
-[![Build Status](https://travis-ci.org/Prasannads/serverless-hotel-aspect-score-calculator.svg?branch=master)](https://travis-ci.org/Prasannads/serverless-hotel-aspect-score-calculator)
+[![Build Status](https://travis-ci.org/prasanna-ds/serverless-hotel-aspect-score-calculator.svg?branch=master)](https://travis-ci.org/prasanna-ds/serverless-hotel-aspect-score-calculator)
 
 # Overview of this Lambda Function.
 
